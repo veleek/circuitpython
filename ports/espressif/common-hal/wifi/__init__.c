@@ -23,6 +23,7 @@
 
 wifi_radio_obj_t common_hal_wifi_radio_obj;
 
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "components/log/include/esp_log.h"
 
 #include "supervisor/port.h"
@@ -215,7 +216,12 @@ void common_hal_wifi_init(bool user_initiated) {
     snprintf(cpy_default_hostname, sizeof(cpy_default_hostname), "cpy-%s-%02x%02x%02x%02x%02x%02x", CIRCUITPY_BOARD_ID + board_trim, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
     const char *default_lwip_local_hostname = cpy_default_hostname;
+    ESP_LOGI(TAG, "Hostname being set to: %s", default_lwip_local_hostname);
     ESP_ERROR_CHECK(esp_netif_set_hostname(self->netif, default_lwip_local_hostname));
+    ESP_LOGI(TAG, "Hostname after set: %s", default_lwip_local_hostname);
+    const char *verified_hostname = NULL;
+    ESP_ERROR_CHECK(esp_netif_get_hostname(self->netif, &verified_hostname));
+    ESP_LOGI(TAG, "Verifying hostname: %s", verified_hostname);
     // set station mode to avoid the default SoftAP
     common_hal_wifi_radio_start_station(self);
     // start wifi
